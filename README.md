@@ -1,5 +1,5 @@
 # giosDownloader
-Process and polish air pollution data.
+Process polish air pollution data.
 
 Installation:
 
