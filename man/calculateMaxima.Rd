@@ -18,7 +18,8 @@ tibble with maxima grouped by year, date, polutant.
 Calculate maxima for a given station and time step.
 }
 \examples{
-obs <- importGiosFromXLSX("DsWrocKorzA", c("NOx", "SO2"), c("2015", "2014"))
+\dontrun{
 obs2 <- calculateMaxima(obs)
+}
 
 }

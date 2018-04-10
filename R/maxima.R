@@ -8,8 +8,9 @@
 #' @export
 #'
 #' @examples
-#' obs <- importGiosFromXLSX("DsWrocKorzA", c("NOx", "SO2"), c("2015", "2014"))
+#' \dontrun{
 #' obs2 <- calculateMaxima(obs)
+#' }
 #'
 
 calculateMaxima <- function(sourceFrame, block = "day") {

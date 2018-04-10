@@ -6,7 +6,7 @@ Description: The package provides functions for importing data from .xlsx files
     available on GIOŚ website to R-friendly format and calculate maxima over given period.
 Depends:
     R (>= 3.3.1)
-License: MIT
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports:
