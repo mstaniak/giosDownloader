@@ -1,13 +1,13 @@
 #' Check if there are any measurement on a given stations for chosen year and polutant.
-#' 
+#'
 #' @param chosenYear year of measurements
 #' @param chosenPolutant measured polutant
 #' @param station station of interest. Please provide current names of stations (values, not names of stationCodes vector)
-#' 
+#'
 #' @return logical value: TRUE if the data is available, FALSE if it's not
-#' 
+#'
 #' @export
-#' 
+#'
 
 isAvailable <- function(chosenYear, chosenPolutant, station) {
   availability %>%
@@ -34,7 +34,7 @@ isAvailable <- function(chosenYear, chosenPolutant, station) {
 
 importOneXLSX <- function(station, polutant, year, path = getwd(),
                           noHours = "1", skip = 3, exact = FALSE) {
-  
+
   fileList <- character(0)
   if(exact) {
     fileList <- path
@@ -51,7 +51,7 @@ importOneXLSX <- function(station, polutant, year, path = getwd(),
 		       measurement = character(0))
 
   if(length(fileList) == 0) return(emptyFrame)
-  
+
   srcFile <- paste(path, fileList, sep = "/")
   colNames <- colnames(read_excel(srcFile))
 
@@ -97,15 +97,17 @@ importOneXLSX <- function(station, polutant, year, path = getwd(),
 #' @return tibble
 #'
 #' @export
-#' 
+#'
 #' @examples
+#' \dontrun {
 #' importGiosFromXLSX("DsWrocKorzA", c("NOx", "SO2"), c("2015", "2014"))
 #' # Default settings, .xlsx files are in the working directory.
 #' importGiosFromXLSX("DsWrocKorzA", c("NOx", "SO2"), c("2015", "2014"), "path-to-the-folder")
 #' # Importing from a different (not working) directory.
+#' }
 #'
 
-importGiosFromXLSX <- function(station, polutants = NULL, years = NULL, path = getwd(), 
+importGiosFromXLSX <- function(station, polutants = NULL, years = NULL, path = getwd(),
                                noHours = "1", skip = 3, exact = FALSE) {
   if(!exact & (is.null(polutants) | is.null(years))) stop("Years and polutants must be given if exact = FALSE")
   if(exact & path == getwd()) stop("Paths to files must be given if exact = TRUE")
@@ -135,7 +137,7 @@ importGiosFromXLSX <- function(station, polutants = NULL, years = NULL, path = g
 
 importOneCSV <- function(station, polutant, year, path = getwd(),
                           noHours = "1", skip = 3, exact = FALSE) {
-  
+
   fileList <- character(0)
   if(exact) {
     fileList <- path
@@ -145,20 +147,20 @@ importOneCSV <- function(station, polutant, year, path = getwd(),
       grep(pattern = polutant, value = TRUE) %>%
       grep(pattern = paste0(noHours, "g"), value = TRUE)
   }
-  
+
   emptyFrame <- tibble(measDate = character(0),
                        station = character(0),
                        polutant = character(0),
                        measurement = character(0))
-  
+
   if(length(fileList) == 0) return(emptyFrame)
-  
+
   srcFile <- paste(path, fileList, sep = "/")
   tmpFrame <- read_csv(srcFile, col_names = TRUE)
   colnames(tmpFrame)[1] <- "measDate"
   tmpFrame <- tmpFrame[-(1:2), ]
   colNames <- colnames(tmpFrame)
-  
+
   if(!sum(grepl(colNames, pattern = station))) {
     isOld  <- sum(grepl(names(stationCodes), pattern = station))
     isNew <- sum(grepl(stationCodes, pattern = station))
@@ -171,10 +173,10 @@ importOneCSV <- function(station, polutant, year, path = getwd(),
       return(emptyFrame)
     }
   }
-  
+
   tmpFrame <- tmpFrame[, c("measDate", station)]
   colnames(tmpFrame)[2] <- "measurement"
-  
+
   tmpFrame %>%
     dplyr::mutate(measurement = str_replace_all(measurement, ",", ".")) %>%
     dplyr::mutate(measurement = as.numeric(measurement),
@@ -190,19 +192,21 @@ importOneCSV <- function(station, polutant, year, path = getwd(),
 #' @return tibble
 #'
 #' @export
-#' 
+#'
 #' @examples
+#' \dontrun {
 #' importGiosFromXLSX("DsWrocKorzA", c("NOx", "SO2"), c("2015", "2014"))
 #' # Default settings, .xlsx files are in the working directory.
 #' importGiosFromXLSX("DsWrocKorzA", c("NOx", "SO2"), c("2015", "2014"), "path-to-the-folder")
 #' # Importing from a different (not working) directory.
+#' }
 #'
 
-importGiosFromCSV <- function(station, polutants = NULL, years = NULL, path = getwd(), 
+importGiosFromCSV <- function(station, polutants = NULL, years = NULL, path = getwd(),
                                noHours = "1", skip = 3, exact = FALSE) {
   if(!exact & (is.null(polutants) | is.null(years))) stop("Years and polutants must be given if exact = FALSE")
   if(exact & path == getwd()) stop("Paths to files must be given if exact = TRUE")
-  
+
   tmpResult <- vector("list", length(polutants)*length(years))
   for(i in polutants) {
     for(j in years) {
