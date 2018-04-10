@@ -30,7 +30,7 @@ tibble
 Import data for one station, multiple years and polutants from .csv files.
 }
 \examples{
-\dontrun {
+\dontrun{
 importGiosFromXLSX("DsWrocKorzA", c("NOx", "SO2"), c("2015", "2014"))
 # Default settings, .xlsx files are in the working directory.
 importGiosFromXLSX("DsWrocKorzA", c("NOx", "SO2"), c("2015", "2014"), "path-to-the-folder")

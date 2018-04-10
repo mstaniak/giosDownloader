@@ -11,9 +11,9 @@
 
 isAvailable <- function(chosenYear, chosenPolutant, station) {
   availability %>%
-    filter(year == chosenYear,
+    dplyr::filter(year == chosenYear,
            polutant == chosenPolutant) %>%
-    select_(.dots = station) %>%
+    dplyr::select_(.dots = station) %>%
     unlist(use.names = FALSE)
 }
 
@@ -40,12 +40,12 @@ importOneXLSX <- function(station, polutant, year, path = getwd(),
     fileList <- path
   } else {
     fileList <- list.files(path, pattern = "*.xlsx") %>%
-      grep(pattern = year, value = TRUE) %>%
-      grep(pattern = polutant, value = TRUE) %>%
-      grep(pattern = paste0(noHours, "g"), value = TRUE)
+      grep(pattern = year, value = TRUE, fixed = TRUE) %>%
+      grep(pattern = polutant, value = TRUE, fixed = TRUE) %>%
+      grep(pattern = paste0(noHours, "g"), value = TRUE, fixed = TRUE)
   }
 
-  emptyFrame <- tibble(measDate = character(0),
+  emptyFrame <- tibble::tibble(measDate = character(0),
 		       station = character(0),
 		       polutant = character(0),
 		       measurement = character(0))
@@ -53,7 +53,7 @@ importOneXLSX <- function(station, polutant, year, path = getwd(),
   if(length(fileList) == 0) return(emptyFrame)
 
   srcFile <- paste(path, fileList, sep = "/")
-  colNames <- colnames(read_excel(srcFile))
+  colNames <- colnames(readxl::read_excel(srcFile))
 
   if(!sum(grepl(colNames, pattern = station))) {
     isOld  <- sum(grepl(names(stationCodes), pattern = station))
@@ -68,14 +68,15 @@ importOneXLSX <- function(station, polutant, year, path = getwd(),
     }
   }
 
-  tmpFrame <- as_tibble(read_excel(srcFile, skip = skip, col_names = FALSE))
+  tmpFrame <- tibble::as_tibble(readxl::read_excel(srcFile, skip = skip,
+                                                   col_names = FALSE))
   colnames(tmpFrame) <- colNames
   colnames(tmpFrame)[1] <- "measDate"
   tmpFrame <- tmpFrame[, c("measDate", station)]
   colnames(tmpFrame)[2] <- "measurement"
 
   tmpFrame %>%
-    dplyr::mutate(measurement = str_replace_all(measurement, ",", ".")) %>%
+    dplyr::mutate(measurement = stringr::str_replace_all(measurement, ",", ".")) %>%
     dplyr::mutate(measurement = as.numeric(measurement),
 	                station = station,
 	                polutant = polutant)
@@ -99,7 +100,7 @@ importOneXLSX <- function(station, polutant, year, path = getwd(),
 #' @export
 #'
 #' @examples
-#' \dontrun {
+#' \dontrun{
 #' importGiosFromXLSX("DsWrocKorzA", c("NOx", "SO2"), c("2015", "2014"))
 #' # Default settings, .xlsx files are in the working directory.
 #' importGiosFromXLSX("DsWrocKorzA", c("NOx", "SO2"), c("2015", "2014"), "path-to-the-folder")
@@ -119,11 +120,11 @@ importGiosFromXLSX <- function(station, polutants = NULL, years = NULL, path = g
     }
   }
   tmpResult %>%
-    bind_rows() %>%
+    dplyr::bind_rows() %>%
     dplyr::select(station, polutant, measDate, measurement) %>%
-    dplyr::mutate(measDate = ymd_hms(measDate)) %>%
-    dplyr::mutate(measDate = round_date(measDate, unit = "hour")) %>%
-    dplyr::filter(year(measDate) %in% years)
+    dplyr::mutate(measDate = lubridate::ymd_hms(measDate)) %>%
+    dplyr::mutate(measDate = lubridate::round_date(measDate, unit = "hour")) %>%
+    dplyr::filter(lubridate::year(measDate) %in% years)
 
 }
 
@@ -143,20 +144,20 @@ importOneCSV <- function(station, polutant, year, path = getwd(),
     fileList <- path
   }  else {
     fileList <- list.files(path, pattern = "*.csv") %>%
-      grep(pattern = year, value = TRUE) %>%
-      grep(pattern = polutant, value = TRUE) %>%
-      grep(pattern = paste0(noHours, "g"), value = TRUE)
+      grep(pattern = year, value = TRUE, fixed = TRUE) %>%
+      grep(pattern = polutant, value = TRUE, fixed = TRUE) %>%
+      grep(pattern = paste0(noHours, "g"), value = TRUE, fixed = TRUE)
   }
 
-  emptyFrame <- tibble(measDate = character(0),
-                       station = character(0),
-                       polutant = character(0),
-                       measurement = character(0))
+  emptyFrame <- tibble::tibble(measDate = character(0),
+                               station = character(0),
+                               polutant = character(0),
+                               measurement = character(0))
 
   if(length(fileList) == 0) return(emptyFrame)
 
   srcFile <- paste(path, fileList, sep = "/")
-  tmpFrame <- read_csv(srcFile, col_names = TRUE)
+  tmpFrame <- readr::read_csv(srcFile, col_names = TRUE)
   colnames(tmpFrame)[1] <- "measDate"
   tmpFrame <- tmpFrame[-(1:2), ]
   colNames <- colnames(tmpFrame)
@@ -178,7 +179,8 @@ importOneCSV <- function(station, polutant, year, path = getwd(),
   colnames(tmpFrame)[2] <- "measurement"
 
   tmpFrame %>%
-    dplyr::mutate(measurement = str_replace_all(measurement, ",", ".")) %>%
+    dplyr::mutate(measurement = stringr::str_replace_all(measurement,
+                                                         ",", ".")) %>%
     dplyr::mutate(measurement = as.numeric(measurement),
                   station = station,
                   polutant = polutant)
@@ -194,7 +196,7 @@ importOneCSV <- function(station, polutant, year, path = getwd(),
 #' @export
 #'
 #' @examples
-#' \dontrun {
+#' \dontrun{
 #' importGiosFromXLSX("DsWrocKorzA", c("NOx", "SO2"), c("2015", "2014"))
 #' # Default settings, .xlsx files are in the working directory.
 #' importGiosFromXLSX("DsWrocKorzA", c("NOx", "SO2"), c("2015", "2014"), "path-to-the-folder")
@@ -216,8 +218,8 @@ importGiosFromCSV <- function(station, polutants = NULL, years = NULL, path = ge
   tmpResult %>%
     dplyr::bind_rows() %>%
     dplyr::select(station, polutant, measDate, measurement) %>%
-    dplyr::mutate(measDate = ymd_hms(measDate)) %>%
-    dplyr::mutate(measDate = round_date(measDate, unit = "hour")) %>%
-    dplyr::filter(year(measDate) %in% years)
+    dplyr::mutate(measDate = lubridate::ymd_hms(measDate)) %>%
+    dplyr::mutate(measDate = lubridate::round_date(measDate, unit = "hour")) %>%
+    dplyr::filter(lubridate::year(measDate) %in% years)
 }
 

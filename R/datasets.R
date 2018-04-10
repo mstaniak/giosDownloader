@@ -5,3 +5,11 @@
 #' @author Mateusz Staniak
 #'
 NULL
+
+#' Codes (old & new) for stations (where pollution is measured)
+#'
+#' @name station_codes
+#' @docType data
+#' @author Mateusz Staniak
+#'
+NULL
