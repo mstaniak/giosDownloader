@@ -13,3 +13,7 @@ Help:
 >?giosDownloader
 
 >browseVignettes(package = "giosDownloader")
+
+Acknowledgement
+
+This work is a part of project "First order Kendall maximal autoregressive processes and their applications", which is carried out within the POWROTY/REINTEGRATION programme of the Foundation for Polish Science co-financed by the European Union under the European Regional Development Fund.
