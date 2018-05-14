@@ -3,7 +3,12 @@
 [![Travis-CI Build Status](https://travis-ci.org/mstaniak/giosDownloader.svg?branch=master)](https://travis-ci.org/mstaniak/giosDownloader)
 
 
-Process polish air pollution data.
+Process polish air pollution data. Main functionality:
+
+`importGiosFromXLSX`
+`importGiosFromCSV`
+
+function that extract data for chosen polutants, years and stations from files downloaded from GIOŚ archive.
 
 Installation:
 
